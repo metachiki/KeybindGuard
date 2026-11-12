@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[2,)"
+license="MIT"
+
+[[mods]]
+modId="keybindguard"
+version="${mod_version}"
+displayName="Keybind Guard"
+authors="Keybind Guard contributors"
+description='''Preserves custom mod keybindings in options.txt during early Minecraft startup, and reloads them after NeoForge registers mod key mappings. Client-side only.'''
+
+[[dependencies.keybindguard]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.230,21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.keybindguard]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[mixins]]
+config="keybindguard.mixins.json"
