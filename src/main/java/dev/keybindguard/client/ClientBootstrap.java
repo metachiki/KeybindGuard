@@ -22,13 +22,17 @@ public final class ClientBootstrap {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.options == null) return;
 
-        // Prevent retries from accidentally overwriting other runtime changes.
-        reloaded = true;
         try {
+            // The mixin still holds the pre-startup snapshot while this reload
+            // applies it after mod key mappings have been registered.
             minecraft.options.load();
             LOGGER.info("Reapplied saved key mappings after mod registration");
         } catch (RuntimeException ex) {
             LOGGER.error("Unable to reload options.txt; check the settings file", ex);
+        } finally {
+            // Do not intercept ordinary saves or intentional player changes.
+            StartupKeybindGuard.finishStartupProtection();
+            reloaded = true;
         }
     }
 }

@@ -7,9 +7,9 @@ Keybind Guard is a client-side workaround for a startup problem in Minecraft 1.2
 ## What it does
 
 - Intercepts option-file loading and saving in the Minecraft client.
-- Remembers `key_...` lines that existed before a save.
-- Restores only *missing* key mappings following an early save. It does not overwrite values already saved by Minecraft.
-- Reloads options once at the first client tick, after mod key registrations should have completed.
+- Takes one fixed snapshot of the `key_...` lines that existed before startup saves begin.
+- During startup only, restores missing key mappings and user values replaced with defaults by an early save.
+- Reloads options once at the first client tick, after mod key registrations should have completed, then permanently disables protection for the rest of the session.
 - Does not send data to the internet and requires no server-side installation.
 
 ## Compatibility
@@ -29,7 +29,7 @@ Install **JDK 21** and **Gradle 8.8**, then in this repository run:
 gradle --no-daemon clean build
 ```
 
-The intended artifact is `build/libs/keybindguard-1.21.1-0.1.0-beta.1.jar`.
+The intended artifact is `build/libs/keybindguard-1.21.1-0.1.0-beta.2.jar`.
 
 Or upload this source to a GitHub repository and run the included **Actions → Build and test mod** workflow. The workflow installs Java/Gradle, runs unit tests, builds the NeoForge mod, checks its contents, and uploads the build artifact. A green run is *not* a substitute for testing in Minecraft.
 
@@ -56,7 +56,7 @@ On Windows: `scripts\test-core.bat`.
 
 - Untested with the user's full modpack and some mods may store key settings outside `options.txt`.
 - A mod that deliberately rewrites keybind settings after the first client tick may still override keys.
-- Only `key_...` lines are protected; other option values are left to Minecraft.
+- Only `key_...` lines are protected, only before the first post-registration reload; other option values are left to Minecraft.
 - This project does not claim to fix every reason `options.txt` can be reset (broken config file, permissions, profile sync, or conflicting mods).
 
 ## Licenses, origins, AI disclosure, and Modrinth
