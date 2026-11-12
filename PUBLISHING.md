@@ -40,7 +40,7 @@ Even where permitted, disclose AI assistance honestly using the appropriate proj
 - Required dependencies: NeoForge (Java 21 is a runtime requirement)
 - License: MIT
 - Categories: Utility / Optimization (bugfix; choose available current tags)
-- Version number: 0.1.0-beta.1 for the experimental initial build
+- Version number: 0.1.0-beta.2 for the experimental test build
 - Release channel: Alpha (until tested)
 - Source link: point to **your own public repository** once it exists
 - Issues link: point to your own issue tracker once it exists

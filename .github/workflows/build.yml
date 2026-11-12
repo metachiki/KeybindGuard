@@ -4,6 +4,8 @@ name: Build and test mod
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -23,11 +25,20 @@ jobs:
         with:
           gradle-version: '8.8'
 
+      - name: Run keybinding persistence regression tests
+        run: bash scripts/test-core.sh
+
       - name: Build mod
         run: gradle --no-daemon clean build
+
+      - name: Verify JAR contents
+        run: |
+          jar --list --file build/libs/keybindguard-1.21.1-0.1.0-beta.2.jar | grep -qx 'META-INF/neoforge.mods.toml'
+          jar --list --file build/libs/keybindguard-1.21.1-0.1.0-beta.2.jar | grep -qx 'keybindguard.mixins.json'
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: KeybindGuard-JAR
           path: build/libs/*.jar
+          if-no-files-found: error

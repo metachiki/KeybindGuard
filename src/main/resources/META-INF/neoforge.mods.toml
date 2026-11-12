@@ -7,7 +7,7 @@ modId="keybindguard"
 version="${mod_version}"
 displayName="Keybind Guard"
 authors="Keybind Guard contributors"
-description='''Preserves custom mod keybindings in options.txt during early Minecraft startup, and reloads them after NeoForge registers mod key mappings. Client-side only.'''
+description='''Protects saved mod keybindings from early startup resets, then reloads them after NeoForge registers mod key mappings. Client-side only.'''
 
 [[dependencies.keybindguard]]
 modId="neoforge"

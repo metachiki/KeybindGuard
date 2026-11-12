@@ -1,6 +1,6 @@
 package dev.keybindguard.mixin;
 
-import dev.keybindguard.client.KeybindFile;
+import dev.keybindguard.client.StartupKeybindGuard;
 import net.minecraft.client.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,53 +13,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
- * Early saves can happen before NeoForge mod keys are registered. Preserve
- * their raw values across saves, then the client bootstrap reloads once.
+ * Early saves can happen before NeoForge mod keys are registered. Keep one
+ * startup snapshot, restore it across those saves, then reload it once after
+ * registration. The protection is released before a player can edit controls.
  */
 @Mixin(Options.class)
 public abstract class OptionsMixin {
     @Shadow private File optionsFile;
 
     @Unique private static final Logger KEYBINDGUARD_LOGGER = LogManager.getLogger("KeybindGuard");
-    @Unique private final Map<String, String> keybindguard$previous = new LinkedHashMap<>();
-
     @Inject(method = "load", at = @At("HEAD"))
     private void keybindguard$captureOnLoad(CallbackInfo ci) {
-        keybindguard$capture();
-    }
-
-    @Inject(method = "save", at = @At("HEAD"))
-    private void keybindguard$captureBeforeSave(CallbackInfo ci) {
-        keybindguard$capture();
+        if (optionsFile == null) return;
+        try {
+            StartupKeybindGuard.capture(optionsFile.toPath());
+        } catch (IOException e) {
+            KEYBINDGUARD_LOGGER.warn("Could not snapshot options.txt key mappings", e);
+        }
     }
 
     @Inject(method = "save", at = @At("TAIL"))
     private void keybindguard$restoreAfterSave(CallbackInfo ci) {
         if (optionsFile == null || !optionsFile.isFile()) return;
         try {
-            int restored = KeybindFile.restoreMissing(optionsFile.toPath(), keybindguard$previous);
+            int restored = StartupKeybindGuard.restore(optionsFile.toPath());
             if (restored > 0) {
-                KEYBINDGUARD_LOGGER.debug("Protected {} key mapping(s) during early save", restored);
+                KEYBINDGUARD_LOGGER.debug("Restored {} startup key mapping(s) after an early save", restored);
             }
-            // Refresh the snapshot: changes saved by Minecraft now take precedence.
-            keybindguard$previous.clear();
-            keybindguard$previous.putAll(KeybindFile.read(optionsFile.toPath()));
         } catch (IOException e) {
             KEYBINDGUARD_LOGGER.warn("Could not protect options.txt key mappings", e);
-        }
-    }
-
-    @Unique
-    private void keybindguard$capture() {
-        if (optionsFile == null || !optionsFile.isFile()) return;
-        try {
-            keybindguard$previous.putAll(KeybindFile.read(optionsFile.toPath()));
-        } catch (IOException e) {
-            KEYBINDGUARD_LOGGER.warn("Could not read options.txt key mappings", e);
         }
     }
 }

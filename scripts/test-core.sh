@@ -4,5 +4,7 @@ cd "$(dirname "$0")/.."
 mkdir -p build/core-test-classes
 javac --release 21 -d build/core-test-classes \
   src/main/java/dev/keybindguard/client/KeybindFile.java \
+  src/main/java/dev/keybindguard/client/StartupKeybindProtection.java \
+  src/main/java/dev/keybindguard/client/StartupKeybindGuard.java \
   src/test/java/dev/keybindguard/client/KeybindFileTest.java
 java -cp build/core-test-classes dev.keybindguard.client.KeybindFileTest
